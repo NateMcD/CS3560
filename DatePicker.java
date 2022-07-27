@@ -2,6 +2,8 @@ package MeetingScheduler;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
+
 import javax.swing.*;
  
 class DatePicker {
@@ -12,7 +14,7 @@ class DatePicker {
     JDialog d;
     JButton[] button = new JButton[49];
  
-    public DatePicker(JFrame parent) {
+    public DatePicker(JFrame parent, HashMap<String, Meeting> MeetingSet) {
         d = new JDialog();
         d.setModal(true);
         String[] header = { "Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat" };
@@ -81,7 +83,7 @@ class DatePicker {
         if (day.equals(""))
             return day;
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
-                "dd-MM-yyyy");
+                "MM-dd-yyyy");
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.set(year, month, Integer.parseInt(day));
         return sdf.format(cal.getTime());
