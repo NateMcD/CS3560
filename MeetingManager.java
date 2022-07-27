@@ -157,7 +157,16 @@ public class MeetingManager implements ActionListener
 			Meeting meeting = meetingEntry.getValue();
 			
 			// check if meeting is going on during an existing one
-			if (StartDate.equals(meeting.StartTime) || (StartDate.after(meeting.StartTime) && StartDate.before(meeting.EndTime)))
+			boolean bSameTime = (StartDate.equals(meeting.StartTime) || (StartDate.after(meeting.StartTime) && StartDate.before(meeting.EndTime)));
+			if (!bSameTime)
+			{
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(StartDate);
+				cal.add(Calendar.HOUR, 1);
+				Date AltStartDate = cal.getTime();
+				bSameTime = (AltStartDate.equals(meeting.StartTime) || (AltStartDate.after(meeting.StartTime) && AltStartDate.before(meeting.EndTime)));
+			}
+			if (bSameTime)
 			{
 				if (meeting.DesignatedRoom.ID == RoomID)
 				{
@@ -453,6 +462,7 @@ public class MeetingManager implements ActionListener
 		dateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
             	JFrame dateFrame = new JFrame("Date Selection");
+            	dateFrame.setLocation(0,0);
             	dateFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         		dateFrame.setSize(300, 300);
             	dateLabel.setText(new DatePicker(dateFrame, MeetingSet).setPickedDate());
