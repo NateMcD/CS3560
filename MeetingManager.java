@@ -19,21 +19,6 @@ public class MeetingManager implements ActionListener
 	final JList<String> list = new JList<>(model);
 	private boolean bInitialized = false;
 	
-	// Meeting Title to Meeting
-	HashMap<String, Meeting> MeetingSet = new HashMap<String, Meeting>();
-	// Employee Name to Employee
-	HashMap<String, Employee> EmployeeSet = new HashMap<String, Employee>();
-	// Room Number to Room
-	HashMap<Integer, Room> RoomSet = new HashMap<Integer, Room>();
-	// Meeting title to Array of Employees
-	HashMap<String, List<String>> MembershipSet = new HashMap<String, List<String>>();
-	// Employee Name to Array of Meetings in their schedule
-	HashMap<String, List<Meeting>> EmployeeScheduleSet = new HashMap<String, List<Meeting>>();
-	// Room ID to Array of Meetings booked in it
-	HashMap<Integer, List<Meeting>> RoomScheduleSet = new HashMap<Integer, List<Meeting>>();
-	// Employee Name to Array of Meetings they've been invited to
-	HashMap<String, List<Meeting>> NotificationsSet = new HashMap<String, List<Meeting>>();
-	
 	public MeetingManager ()
 	{
 		InitEmployees();
@@ -42,13 +27,13 @@ public class MeetingManager implements ActionListener
 	
 	public void InitEmployees()
 	{
-		EmployeeSet.put("Admin", new Employee("Admin", true));
+		EmployeeSet.Put(new Employee("Admin", true));
 		
 		String[] employeesToAdd = {"Nate", "Nick", "Angel"};
 		for (int i = 0; i < employeesToAdd.length; i++)
 		{
-			EmployeeSet.put(employeesToAdd[i], new Employee(employeesToAdd[i], false));
-			NotificationsSet.put("Admin", new ArrayList<Meeting>());
+			EmployeeSet.Put(new Employee(employeesToAdd[i], false));
+			NotificationsSet.Put("Admin", new ArrayList<Meeting>());
 		}
 	}
 	
@@ -56,8 +41,8 @@ public class MeetingManager implements ActionListener
 	{
 		for (int i = 1; i <= 4; i++)
 		{
-			RoomSet.put(i, new Room(i));
-			RoomScheduleSet.put(i, new ArrayList<Meeting>());
+			RoomSet.Put(new Room(i));
+			RoomScheduleSet.Put(i, new ArrayList<Meeting>());
 		}
 	}
 	
@@ -93,7 +78,7 @@ public class MeetingManager implements ActionListener
 		currentPanel.setLayout(new BorderLayout());
 		
 		model.removeAllElements();
-		Iterator<Entry<String, Employee>> esIterator = EmployeeSet.entrySet().iterator();
+		Iterator<Entry<String, Employee>> esIterator = EmployeeSet.GetIterator();
 		while (esIterator.hasNext())
 		{
 			Map.Entry<String, Employee> mapEntry = (Map.Entry<String, Employee>)esIterator.next();
@@ -150,7 +135,7 @@ public class MeetingManager implements ActionListener
 	
 	public String IsMeetingValid(Date StartDate, int RoomID, List<String> attendees)
 	{
-		Iterator<Entry<String, Meeting>> meetingIterator = MeetingSet.entrySet().iterator();
+		Iterator<Entry<String, Meeting>> meetingIterator = MeetingSet.GetIterator();
 		while (meetingIterator.hasNext())
 		{
 			Map.Entry<String, Meeting> meetingEntry = (Map.Entry<String, Meeting>)meetingIterator.next();
@@ -200,7 +185,7 @@ public class MeetingManager implements ActionListener
 		for (int i = 0; i < meetingsToDelete.size(); i++)
 		{
 			String meetingToDeleteName = meetingsToDelete.get(i);
-			Iterator<Entry<String, Employee>> esIterator = EmployeeSet.entrySet().iterator();
+			Iterator<Entry<String, Employee>> esIterator = EmployeeSet.GetIterator();
 			while (esIterator.hasNext())
 			{
 				Map.Entry<String, Employee> mapEntry = (Map.Entry<String, Employee>)esIterator.next();
@@ -208,35 +193,35 @@ public class MeetingManager implements ActionListener
 				Employee mapValue = mapEntry.getValue();
 				DeleteMeetingFromUser(mapValue, meetingToDeleteName);
 				
-				if (EmployeeScheduleSet.containsKey(mapKey))
+				if (EmployeeScheduleSet.ContainsKey(mapKey))
 				{
-					List<Meeting> meetingsFromES = EmployeeScheduleSet.get(mapKey);
+					List<Meeting> meetingsFromES = EmployeeScheduleSet.Get(mapKey);
 					if (!meetingsFromES.isEmpty())
 						meetingsFromES.removeIf(m -> (m.Title == meetingToDeleteName));
 				}
 				
-				if (NotificationsSet.containsKey(mapKey))
+				if (NotificationsSet.ContainsKey(mapKey))
 				{
-					List<Meeting> meetingsFromNS = NotificationsSet.get(mapKey);
+					List<Meeting> meetingsFromNS = NotificationsSet.Get(mapKey);
 					if (!meetingsFromNS.isEmpty())
 						meetingsFromNS.removeIf(m -> (m.Title == meetingToDeleteName));
 				}
 			}
 			
-			if (RoomScheduleSet.containsKey(MeetingSet.get(meetingToDeleteName).DesignatedRoom.ID))
+			if (RoomScheduleSet.ContainsKey(MeetingSet.Get(meetingToDeleteName).DesignatedRoom.ID))
 			{
-				List<Meeting> meetingsFromRS = RoomScheduleSet.get(MeetingSet.get(meetingToDeleteName).DesignatedRoom.ID);
+				List<Meeting> meetingsFromRS = RoomScheduleSet.Get(MeetingSet.Get(meetingToDeleteName).DesignatedRoom.ID);
 				if (meetingsFromRS.isEmpty())
 					meetingsFromRS.removeIf(m -> (m.Title == meetingToDeleteName));
 			}
 			
-			MeetingSet.remove(meetingToDeleteName);
+			MeetingSet.Remove(meetingToDeleteName);
 		}
 	}
 	
 	public void DeclineMeetings(List<String> meetingsToDecline)
 	{
-		Employee e = EmployeeSet.get(UserID);
+		Employee e = EmployeeSet.Get(UserID);
 		for (int i = 0; i < meetingsToDecline.size(); i++)
 		{
 			String meetingToDeclineName = meetingsToDecline.get(i);
@@ -251,7 +236,7 @@ public class MeetingManager implements ActionListener
 	
 	public void AcceptMeetings(List<String> meetingsToAccept)
 	{
-		Employee e = EmployeeSet.get(UserID);
+		Employee e = EmployeeSet.Get(UserID);
 		for (int i = 0; i < meetingsToAccept.size(); i++)
 		{
 			String meetingToAcceptName = meetingsToAccept.get(i);
@@ -267,7 +252,7 @@ public class MeetingManager implements ActionListener
 			}
 			
 			if (!bHasMeeting)
-				e.AcceptedMeetings.add(MeetingSet.get(meetingToAcceptName));
+				e.AcceptedMeetings.add(MeetingSet.Get(meetingToAcceptName));
 			if (!e.InvitedMeetings.isEmpty())
 				e.InvitedMeetings.removeIf(m -> (m.Title == meetingToAcceptName));
 			if (!e.OwnedMeetings.isEmpty())
@@ -278,7 +263,7 @@ public class MeetingManager implements ActionListener
 	public void ShowExistingMeetingUI()
 	{
 		currentPanel.setLayout(new BorderLayout(10,25));
-		Employee e = EmployeeSet.get(UserID);
+		Employee e = EmployeeSet.Get(UserID);
 		
 	// OWNED MEETING SECTION
 		JPanel ownedMeetingPanel = new JPanel();
@@ -290,7 +275,7 @@ public class MeetingManager implements ActionListener
 		final DefaultListModel<String> ownedMeetingsModel = new DefaultListModel<>();
 		if (UserID == "Admin")
 		{
-			Iterator<Entry<String, Meeting>> meetingIterator = MeetingSet.entrySet().iterator();
+			Iterator<Entry<String, Meeting>> meetingIterator = MeetingSet.GetIterator();
 			while (meetingIterator.hasNext())
 			{
 				Map.Entry<String, Meeting> meetingEntry = (Map.Entry<String, Meeting>)meetingIterator.next();
@@ -443,7 +428,7 @@ public class MeetingManager implements ActionListener
 		
 		// sanitize people who can attend
 		model.removeAllElements();
-		Iterator<Entry<String, Employee>> esIterator = EmployeeSet.entrySet().iterator();
+		Iterator<Entry<String, Employee>> esIterator = EmployeeSet.GetIterator();
 		while (esIterator.hasNext())
 		{
 			Map.Entry<String, Employee> mapEntry = (Map.Entry<String, Employee>)esIterator.next();
@@ -465,7 +450,7 @@ public class MeetingManager implements ActionListener
             	dateFrame.setLocation(0,0);
             	dateFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         		dateFrame.setSize(300, 300);
-            	dateLabel.setText(new DatePicker(dateFrame, MeetingSet).setPickedDate());
+            	dateLabel.setText(new DatePicker(dateFrame, MeetingSet.Map).setPickedDate());
             }
         });
 		currentPanel.add(dateButton);
@@ -486,7 +471,7 @@ public class MeetingManager implements ActionListener
 		currentPanel.add(timeLabel);
 		
 		List<Integer> RoomIDs = new ArrayList<Integer>();
-		Iterator<Entry<Integer, Room>> roomIterator = RoomSet.entrySet().iterator();
+		Iterator<Entry<Integer, Room>> roomIterator = RoomSet.GetIterator();
 		while (roomIterator.hasNext())
 		{
 			Map.Entry<Integer, Room> roomEntry = (Map.Entry<Integer, Room>)roomIterator.next();
@@ -541,44 +526,43 @@ public class MeetingManager implements ActionListener
 	            	cal.setTime(startDate);
 	            	cal.add(Calendar.HOUR, 1);
 	            	Date endDate = cal.getTime();
-	            	// TODO: Parse dates into startDate and endDate
 	            	
 	            	Meeting newMeeting = new Meeting(
 	            			meetingTitleTF.getText(),
 	            			taskTF.getText(),
 	            			startDate,
 	            			endDate,
-	            			RoomSet.get((Integer)roomSpinner.getValue()),
+	            			RoomSet.Get((Integer)roomSpinner.getValue()),
 	            			UserID);
 	            	
-	            	MeetingSet.put(newMeeting.Title, newMeeting);
+	            	MeetingSet.Put(newMeeting);
 	            	
 	            	// Add meeting to owner
-	            	EmployeeSet.get(UserID).MeetingOwn(newMeeting);
+	            	EmployeeSet.Get(UserID).MeetingOwn(newMeeting);
 	            	
 	            	// Add invited employees to meeting
 	            	// Add meeting to employee's pending meetings
 	            	List<String> listSelectedValues = list.getSelectedValuesList();
 	            	for (int i = 0; i < listSelectedValues.size(); i++)
 	            	{
-	            		EmployeeSet.get(listSelectedValues.get(i)).MeetingInvite(newMeeting);
+	            		EmployeeSet.Get(listSelectedValues.get(i)).MeetingInvite(newMeeting);
 	            		newMeeting.InviteEmployee(listSelectedValues.get(i));
-	            		if (NotificationsSet.containsKey(listSelectedValues.get(i)))
+	            		if (NotificationsSet.ContainsKey(listSelectedValues.get(i)))
 	            		{
-	            			NotificationsSet.get(listSelectedValues.get(i)).add(newMeeting);
+	            			NotificationsSet.Get(listSelectedValues.get(i)).add(newMeeting);
 	            		}
 	            		else
 	            		{
 	            			List<Meeting> meetingList = new ArrayList<Meeting>();
 	            			meetingList.add(newMeeting);
-	            			NotificationsSet.put(listSelectedValues.get(i), meetingList);
+	            			NotificationsSet.Put(listSelectedValues.get(i), meetingList);
 	            		}
 	            	}
 	            	newMeeting.EmployeesAttending.put(UserID, true);
 	            	
 	            	int selectedRoomID = (int)roomModel.getValue();
-	            	RoomScheduleSet.get(selectedRoomID).add(newMeeting);
-	            	MembershipSet.put(newMeeting.Title, list.getSelectedValuesList());
+	            	RoomScheduleSet.Get(selectedRoomID).add(newMeeting);
+	            	MembershipSet.Put(newMeeting.Title, list.getSelectedValuesList());
 	            	
 	            	CleanPanel();
 	            	ShowActionUI();
@@ -596,13 +580,8 @@ public class MeetingManager implements ActionListener
 		dateFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		dateFrame.setSize(300, 300);
 		
-		//TODO: Sanitize DatePicker to only show valid times that all selected employees can attend
-		
-		DatePicker datePicker = new DatePicker(dateFrame, MeetingSet);
+		DatePicker datePicker = new DatePicker(dateFrame, MeetingSet.Map);
 		return datePicker.setPickedDate();
-		//Calendar cal = Calendar.getInstance();
-		//Date today = cal.getTime();
-		//datePicker.setPickedDate(today.getDay() + "-" + today.getMonth() + "-" + today.getYear());)
 	}
 	
 	public void actionPerformed(ActionEvent e)
